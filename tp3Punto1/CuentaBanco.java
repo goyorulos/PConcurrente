@@ -1,4 +1,4 @@
-package tp3.punto1;
+package tp3Punto1;
 
 public class CuentaBanco {
     private int balance;
