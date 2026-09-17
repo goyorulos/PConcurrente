@@ -5,13 +5,15 @@ public class Auto implements Runnable {
     private int km_recorridos;
     private int combustible;
     private int nivelReseva;
-    private Surtidor unSurtidor;
-    public Auto(String unNombre, int km,int unCombustible, int reserva, Surtidor elSurtidor){
+    private Surtidor surtidor;
+    private Controlador controlador;
+    public Auto(String unNombre, int km,int unCombustible, int reserva, Surtidor surti, Controlador contr){
         this.nombre = unNombre;
         this.km_recorridos = km;
         this.combustible = unCombustible;
         this.nivelReseva = reserva;
-        this.unSurtidor = elSurtidor;
+        this.surtidor = surti;
+        this.controlador = contr;
     }
 
     public boolean darVuelta(){
@@ -36,9 +38,15 @@ public class Auto implements Runnable {
     public void run(){
         for(int i = 0; i<=10; i++){
             if(!darVuelta()){
-                if(unSurtidor.cargarAuto()){
+                while(surtidor.hayCamion()){
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(surtidor.cargarAuto()){
                     this.combustible += 10;
-                    System.out.println(this.nombre + " Cargo");
                 }
             }
         }

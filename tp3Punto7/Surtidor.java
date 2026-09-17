@@ -3,10 +3,12 @@ package tp3Punto7;
 public class Surtidor {
     private int combustibleMax;
     private int combustibleGastado;
+    private Controlador controlador;
 
-    public Surtidor(int uncombustible) {
+    public Surtidor(int uncombustible, Controlador contr) {
         this.combustibleMax = uncombustible;
         this.combustibleGastado = 0;
+        this.controlador = contr;
     }
 
     public synchronized boolean cargarAuto() {
@@ -23,6 +25,27 @@ public class Surtidor {
             }
         } else {
             System.out.println("no hay nafta");
+        }
+        return exito;
+    }
+
+    public synchronized void cargarSurtidor(){
+        this.combustibleGastado = 0;
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean hayNafta(){
+        return (combustibleGastado >= combustibleMax);
+    }
+
+    public boolean hayCamion(){
+        boolean exito = false;
+        if(controlador.consultarTurno(1)){
+            exito = true;
         }
         return exito;
     }
