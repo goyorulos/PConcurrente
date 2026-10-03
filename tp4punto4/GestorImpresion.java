@@ -40,6 +40,7 @@ public class GestorImpresion {
         }else if(tipo ==1){
             adquirirB();
         }else{
+            
             if(hilosEsperandoA<=hilosEsperandoB){
                 adquirirA();
                 eleccion = 0;
