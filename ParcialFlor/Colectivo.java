@@ -1,4 +1,4 @@
-package ParcialFlorGranchelliLucasVersion;
+package ParcialFlor;
 
 import java.util.concurrent.Semaphore;
 
@@ -6,59 +6,40 @@ import java.util.concurrent.Semaphore;
     private int cantMax;
     private int pasajeros;
     private int esperando;
-    private Semaphore parada;
     private Semaphore entrada;
     private Semaphore salida;
     private Semaphore cerrar;
-    private Semaphore salir;
+    private Semaphore iniciarViaje;
     private Semaphore mutex;
-    private Semaphore entro;
 
     public Colectivo(int cantidad){
         this.cantMax = cantidad;
         this.pasajeros = 0;
         this.esperando = 0;
-        this.parada = new Semaphore(0);
         this.entrada = new Semaphore(0);
         this.salida = new Semaphore(0);
         this.mutex = new Semaphore(1);
         this.cerrar = new Semaphore(0);
-        this.salir = new Semaphore(0);
-        this.entro = new Semaphore(0);
+        this.iniciarViaje = new Semaphore(0);
     }
 
-    public void llegarParada() throws InterruptedException{
-        this.mutex.acquire();
-        this.esperando ++;
-        this.mutex.release();
-        if(esperando == 1){
-            this.parada.release();
-        }
+    public void habilitarEntrada(){
+        this.entrada.release();
     }
 
-    public void habilitarEntrada() throws InterruptedException{
+    public void entrar(){
         try {
-			this.parada.acquire();
+			this.mutex.acquire();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-        this.entrada.release();
-        this.entro.acquire();
-        if(pasajeros < cantMax){
-            this.entrada.release();
-        }else if (this.pasajeros == this.cantMax || this.esperando == 0){
-            this.salir.release();
-        }
+        this.esperando ++;
         this.mutex.release();
-    }
-
-    public void entrar(){       
         try {
 			this.entrada.acquire();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-        
         try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
@@ -70,8 +51,12 @@ import java.util.concurrent.Semaphore;
 			e.printStackTrace();
 		}
         this.pasajeros ++;
-        this.entro.release();
-        
+        if(pasajeros < cantMax){
+            this.entrada.release();
+        }else if (this.pasajeros == this.cantMax || this.esperando == 0){
+            this.iniciarViaje.release();
+        }
+        this.mutex.release();
     }
 
     public void salirPasajeros(){
@@ -105,7 +90,7 @@ import java.util.concurrent.Semaphore;
 
     public void iniciarViaje(){
         try {
-			this.salir.acquire();
+			this.iniciarViaje.acquire();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

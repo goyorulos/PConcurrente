@@ -1,4 +1,4 @@
-package ParcialFlorGranchelliLucasVersion;
+package ParcialFlorLucasVersion;
 
 public class Pasajero implements Runnable{
     private Colectivo cole;

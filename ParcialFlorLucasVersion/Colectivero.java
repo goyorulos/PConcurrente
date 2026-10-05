@@ -1,4 +1,4 @@
-package ParcialFlorGranchelli;
+package ParcialFlorLucasVersion;
 
 public class Colectivero implements Runnable{
     private Colectivo cole;
