@@ -1,6 +1,5 @@
 package tp3Punto3;
 
-import javax.swing.Action;
 
 public class Actividad {
     private String nombre;
@@ -25,6 +24,7 @@ public class Actividad {
         
         try {
             Thread.sleep(5000);
+            System.out.println(nombre);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

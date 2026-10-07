@@ -7,10 +7,19 @@ public class Cliente implements Runnable{
         this.pelu = laPelu;
     }
 
+
     public void run(){
-        if()
-        this.pelu.entrarPeluqueria();
-        this.pelu.levantarse();
+        if(this.pelu.entrarPeluqueria()){
+            this.pelu.esperarCorte();
+        }else{
+            if(this.pelu.intentarSentarseEspera()){
+                this.pelu.esperarCorte();
+                if(this.pelu.entrarPeluqueria()){
+                    this.pelu.esperarCorte();
+                }
+            }
+
+        }
     }
 
 }

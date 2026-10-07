@@ -8,6 +8,5 @@ public class Main {
             competidores[i] = new Corredor("#"+i);
             competidores[i].start();
         }
-        for(int i = 0; i<competidores.length();i++){}
     }
 }

@@ -3,25 +3,41 @@ package tp4Punto10Barbero;
 import java.util.concurrent.Semaphore;
 
 public class Peluqueria {
-    private Semaphore sillaCorte;
     private Semaphore cortarPelo;
-    private Semaphore corteTerminado;
-    private Semaphore espera;
-    private int sillasDisponibles;
-    private int esperandoEspera;
+    private Semaphore [] peluqueros;
+    private Semaphore cortarse;
     private Semaphore mutex;
-
-    public Peluqueria(int sillas){
+    private Semaphore mutexPeluquero;
+    private Semaphore espera;
+    private int sillasTotales;
+    private int sillasUsadas;
+    
+    public Peluqueria(int cantPeluqueros, int sillas){
         this.cortarPelo = new Semaphore(0);
-        this.sillaCorte = new Semaphore(1);
-        this.corteTerminado = new Semaphore(0);
-        this.espera = new Semaphore(0);
-        this.sillasDisponibles = sillas;
+        this.peluqueros = new Semaphore[cantPeluqueros];
+        this.declararPeluqueros();
+        this.cortarse = new Semaphore(0);
+        this.sillasTotales = sillas;
         this.mutex = new Semaphore(1);
-        this.esperandoEspera = 0;
+        this.espera = new Semaphore(0);
+        this.mutexPeluquero = new Semaphore(1);
+
     }
 
-    public void cortar(){ //Peluquero
+    public boolean hayEspera(){
+        return (sillasUsadas>0);
+    }
+
+    private void declararPeluqueros(){
+        for (int i = 0; i<peluqueros.length;i++){
+            peluqueros[i] = new Semaphore(1);
+        }
+    }
+
+
+    //==================================================//
+
+    public void esperarCliente(){
         try {
             this.cortarPelo.acquire();
         } catch (InterruptedException e) {
@@ -30,50 +46,54 @@ public class Peluqueria {
     }
 
     public boolean entrarPeluqueria(){
-        return this.sillaCorte.tryAcquire();
+        boolean entro = false;
+        for(int i = 0; i<peluqueros.length;i++){
+            if(peluqueros[i].tryAcquire()){
+                this.cortarPelo.release();
+                entro = true;
+            }
+        }
+        return entro;
     }
 
-    public void cortarsePelo(){ //cliente
-        this.cortarPelo.release();
+    public void esperarCorte(){
         try {
-            this.corteTerminado.acquire();
+            this.cortarse.acquire();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
-    public void terminarCorte(){
-        this.corteTerminado.release();
+    public void cortarPelo(){
+        this.cortarse.release();
+    }
+
+    public boolean intentarSentarseEspera(){
+        boolean exito = false;
+        try {
+            this.mutex.acquire();
+            if(this.sillasUsadas<this.sillasTotales){
+                this.sillasUsadas++;   
+                exito = true;
+            }
+            this.mutex.release();
+            this.cortarse.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return exito;
     }
 
     public void levantarse(){
         try {
             this.mutex.acquire();
+            if(this.sillasUsadas>=1){
+                this.espera.release();
+            }
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
     }
 
-    public void sentarseEspera(){
-        try {
-            this.mutex.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        if(this.sillasDisponibles-1 >= 0){
-            this.sillasDisponibles --;
-            this.mutex.release();
-            this.cortarsePelo();
-        }else{
-            this.esperandoEspera ++;
-            this.mutex.release();
-            try {
-                this.espera.acquire();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }
