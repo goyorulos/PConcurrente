@@ -30,30 +30,41 @@ import java.util.concurrent.Semaphore;
     public void llegarParada() throws InterruptedException{
         this.mutex.acquire();
         this.esperando ++;
-        this.mutex.release();
+      
         if(esperando == 1){
             this.parada.release();
         }
+          this.mutex.release();
     }
 
-    public void habilitarEntrada(){
+    public boolean habilitarEntrada(){
+        boolean exito = false;
         try {
 			this.parada.acquire();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-        this.entrada.release();
-        try {
-            this.entro.acquire();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while(!exito){
+                this.entrada.release();
+            try {
+                this.entro.acquire();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if(pasajeros < cantMax && this.esperando > 0){
+                this.mutex.release();
+            }else if (this.pasajeros == this.cantMax || this.esperando == 0){
+                        exito = true;
+                        if (esperando > 0) {
+                                parada.release();
+                            }
+                        this.mutex.release();
+                        this.salir.release();
+            }
         }
-        if(pasajeros < cantMax){
-            this.entrada.release();
-        }else if (this.pasajeros == this.cantMax || this.esperando == 0){
-            this.salir.release();
-        }
-        this.mutex.release();
+        
+       
+        return exito;
     }
 
     public void entrar(){       
@@ -74,6 +85,7 @@ import java.util.concurrent.Semaphore;
 			e.printStackTrace();
 		}
         this.pasajeros ++;
+        this.esperando --;
         this.entro.release();
         
     }
@@ -93,8 +105,10 @@ import java.util.concurrent.Semaphore;
         this.pasajeros --;
         if(this.pasajeros == 0){
             this.cerrar.release();
-        }
+        }else{
+            
         this.salida.release();
+        }
         this.mutex.release();
     }
 

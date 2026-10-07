@@ -7,7 +7,12 @@ public class Pasajero implements Runnable{
     }
 
     public void run(){
-
+        try {
+			cole.llegarParada();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         cole.entrar();
         cole.salirPasajeros();
     }

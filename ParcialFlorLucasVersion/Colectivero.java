@@ -9,8 +9,11 @@ public class Colectivero implements Runnable{
     }
 
     public void run(){
-        for(int i = 0; i<= cantVueltas; i++){
-            cole.habilitarEntrada();
+        for(int i = 0; i< cantVueltas; i++){
+            boolean Partir = false;
+            Partir =  cole.habilitarEntrada();
+            
+          
             cole.iniciarViaje();
             try {
                 Thread.sleep(1000);
