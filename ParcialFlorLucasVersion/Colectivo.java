@@ -54,12 +54,12 @@ import java.util.concurrent.Semaphore;
             if(pasajeros < cantMax && this.esperando > 0){
                 this.mutex.release();
             }else if (this.pasajeros == this.cantMax || this.esperando == 0){
-                        exito = true;
-                        if (esperando > 0) {
-                                parada.release();
-                            }
-                        this.mutex.release();
-                        this.salir.release();
+                exito = true;
+                if (esperando > 0) {
+                        parada.release();
+                    }
+                this.mutex.release();
+                this.salir.release();
             }
         }
         

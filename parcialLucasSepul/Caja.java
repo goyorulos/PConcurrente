@@ -10,6 +10,8 @@ public class Caja {
     private int cantActual;
     private int cantAutosActuales;
     private int cantAutosMax;
+    private boolean libreDepositar;
+    private boolean libreSacar;
 
     public Caja(int cantidadMaxima){
         this.semSacar = new Semaphore(0);
@@ -19,6 +21,8 @@ public class Caja {
         this.cantActual = 0;
         this.cantAutosActuales =0;
         this.cantAutosMax = 5;
+        this.libreDepositar = false;
+        this.libreSacar = true;
     }
 
     //Equipo1/2/3
@@ -29,9 +33,13 @@ public class Caja {
             this.mutex.release();
             this.semDepositar.acquire();
             this.mutex.acquire();
+            this.libreSacar = false;
         }
         this.cantActual++;
-        this.semSacar.release();
+        if(!this.libreDepositar){
+            this.libreDepositar = true;
+            this.semSacar.release();
+        }
         this.mutex.release();
 
     }
