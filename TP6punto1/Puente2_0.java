@@ -1,3 +1,4 @@
+package TP6punto1;
 
 import java.util.concurrent.Semaphore;
 public class Puente2_0 {
@@ -23,22 +24,22 @@ public class Puente2_0 {
             this.cruzando++;
             this.mutex.release();
             
-    }else{
-        this.cantEsperaNorte++;
-        this.mutex.release();
-        this.esperaNorte.acquire();
-        primero = true;
-    }
-    System.out.println("Cruzando desde el norte" + "auto " + Thread.currentThread().getName());
-    
-    this.fin.acquire();
-    this.semLLaveN.release();
-    if(primero){
-        Thread.sleep(1000);
-    }
+        }else{
+            this.cantEsperaNorte++;
+            this.mutex.release();
+            this.esperaNorte.acquire();
+            primero = true;
+        }
+        System.out.println("Cruzando desde el norte" + "auto " + Thread.currentThread().getName());
 
-  this.mutex.acquire();
-     if(this.cantEsperaNorte > 0){
+        this.fin.acquire();
+        this.semLLaveN.release();
+        if(primero){
+            Thread.sleep(1000);
+        }
+
+        this.mutex.acquire();
+        if(this.cantEsperaNorte > 0){
             this.cantEsperaNorte --;
             this.cruzando++;
             this.esperaNorte.release();
@@ -56,8 +57,9 @@ public void salirNorte() throws InterruptedException{
             this.cantEsperaSur--;
             this.cruzando++;
             this.esperaSur.release();
-            this.direccion = -1;
           
+        }else if(cantEsperaNorte == 0){
+            this.direccion = -1;
         }
     }
             this.fin.release();

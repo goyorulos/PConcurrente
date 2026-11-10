@@ -11,6 +11,7 @@ public class Pista {
     private Semaphore despegue = new Semaphore(0);
     private Semaphore aterrizaje = new Semaphore(0);
     private Semaphore mutex = new Semaphore(1);
+    private Semaphore pista = new Semaphore(1,true);
 
 
 
@@ -22,6 +23,7 @@ public class Pista {
         mutex.release();
         solicitarAterrizaje.release();
         aterrizaje.acquire();
+        pista.acquire();
     }
 
     public void aterrizar() throws InterruptedException{
@@ -30,6 +32,7 @@ public class Pista {
                        //pero me parecio correcto asi en el codigo del hilo hago un sleep entre los metodos
         mutex.release();
         System.out.println("aterrizo");
+        pista.release();
     }
 
     //============aviones Tierra====================
@@ -40,6 +43,7 @@ public class Pista {
         mutex.release();
         solicitarDespegue.release();
         despegue.acquire();
+        pista.acquire();
     }
 
     public void despegar() throws InterruptedException{
@@ -48,6 +52,7 @@ public class Pista {
                        //pero me parecio correcto asi en el codigo del hilo hago un sleep entre los metodos
         mutex.release();
         System.out.println("Despego");
+        pista.release();
     }
 
 
@@ -63,12 +68,18 @@ public class Pista {
             cantAterrizados++;
             mutex.release();
             solicitarAterrizaje.acquire();
+            mutex.acquire();
+            avionesAire--;
+            mutex.release();
             aterrizaje.release();
         }else if(avionesTierra >0){
             mutex.release();
             solicitarDespegue.acquire();
             despegue.release();
+        }else{
+            mutex.release();
         }
+        
     }
 
 }
